@@ -1,4 +1,4 @@
-# Simple Snake Game in Python 3 for Beginners
+ Simple Snake Game in Python 3 for Beginners
 # By @TokyoEdTech
 # modified by Yan Luo
 #
@@ -14,8 +14,7 @@ import serial
 # Note the serial port dev file name
 # need to change based on the particular host machine
 # TODO uncomment the following two lines to initialize serial port
-#serialDevFile = '/dev/ttyS3'
-#ser=serial.Serial(serialDevFile, 9600, timeout=0)
+
 
 ser=serial.Serial('COM3', 9600, timeout=0)
 
@@ -29,7 +28,7 @@ ppa = 10
 
 # Set up the screen
 wn = turtle.Screen()
-wn.title("Snake Game by @TokyoEdTech (mod by YL)")
+wn.title("Snake Game by GE")
 wn.bgcolor("green")
 wn.setup(width=600, height=600)
 wn.tracer(0) # Turns off the screen updates
@@ -111,13 +110,7 @@ while True:
     # TODO: notes by Prof. Luo
     # you need to add your code to read control information from serial port
     # then use that information to set head.direction
-    # For example, 
-    # if control_information == 'w':
-    #     head.direction = "up"
-    # elif control_information == 's':
-    #     head.direction = "down"
-    # elif ......
-    #
+ 
     # JOYSTICK
     value = ser.readline()
     print(value)
@@ -129,7 +122,9 @@ while True:
         go_right()
     elif value == b's':
         go_down()
-    
+    elif value == b'z':
+        food.color("gold")
+        bonus = 'z'
 
     # Check for a collision with the border
     if head.xcor()>290 or head.xcor()<-290 or head.ycor()>290 or head.ycor()<-290:
@@ -151,7 +146,12 @@ while True:
         delay = 0.1
 
         pen.clear()
-        pen.write("Score: {}  High Score: {}  P/A: {}".format(score, high_score, ppa), align="center", font=("Courier", 24, "normal")) 
+        if bonus == 'z':
+            ppa = 20
+        else:
+            ppa = 10
+        pen.write("Score: {}  High Score: {}  P/A: {}".format(score, high_score, ppa), align="center",
+                  font=("Courier", 24, "normal"))
 
 
     # Check for a collision with the food
@@ -161,6 +161,9 @@ while True:
         # you need to send a flag to Arduino indicating an apple is eaten
         # so that the Arduino will beep the buzzer
         # Hint: refer to the example at Serial-RW/pyserial-test.py
+        # Buzzer code
+        line = ser.readline()
+        ser.write(b'x')
 
         # Move the food to a random spot
         x = random.randint(-290, 290)
@@ -179,14 +182,23 @@ while True:
         delay -= 0.001
 
         # Increase the score
-        score += 10
+        if bonus == 'z':
+            score += 20
+        else:
+            score += 10
+        food.color("red")
+        bonus = 'x'
 
         if score > high_score:
             high_score = score
         
         pen.clear()
-        pen.write("Score: {}  High Score: {}  P/A: {}".format(score, high_score, ppa), align="center", font=("Courier", 24, "normal")) 
-
+        if bonus == 'z':
+            ppa = 20
+        else:
+            ppa = 10
+        pen.write("Score: {}  High Score: {}  P/A: {}".format(score, high_score, ppa), align="center",
+                  font=("Courier", 24, "normal"))
     # Move the end segments first in reverse order
     for index in range(len(segments)-1, 0, -1):
         x = segments[index-1].xcor()
@@ -217,13 +229,18 @@ while True:
 
             # Reset the score
             score = 0
-
+               
             # Reset the delay
             delay = 0.1
         
             # Update the score display
             pen.clear()
-            pen.write("Score: {}  High Score: {}  P/A: {}".format(score, high_score, ppa), align="center", font=("Courier", 24, "normal")) 
+            if bonus == 'z':
+               ppa = 20
+            else:
+               ppa = 10
+            pen.write("Score: {}  High Score: {}  P/A: {}".format(score, high_score, ppa), align="center",
+                      font=("Courier", 24, "normal"))
 
     time.sleep(delay)
 
