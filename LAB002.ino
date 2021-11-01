@@ -1,7 +1,7 @@
 
 #include<Wire.h>
 
-char buzzervalue,sendbonus,sendpythonnew='\0', sendpythonold='x';
+char buzzervalue,bonus,pythonnew='\0', pythonold='x';
 const int buzzer = 5;
 const int SW_pin = 2;
 const int X_pin = 0;
@@ -37,36 +37,36 @@ void loop() {
 
   if(AcZ>25000)
   {
-    sendbonus = 'z'; 
-    Serial.write(sendbonus);
+    bonus = 'z'; 
+    Serial.write(bonus);
     delay(400);
   }
 
     
 if(analogRead(X_pin) < 200 ||GyY <= -10000)
   { 
-    sendpythonnew = 'a';
+    pythonnew = 'a';
   }
   else if(analogRead(X_pin) > 800 ||GyY >= 10000)
   {
-    sendpythonnew = 'd';
+    pythonnew = 'd';
   }
  else if(analogRead(Y_pin) < 200 ||GyX <= -10000)
   {
-    sendpythonnew = 'w';
+    pythonnew = 'w';
   }
   else if(analogRead(Y_pin) > 800|| GyX >= 10000)
   {
-    sendpythonnew = 's';
+    pythonnew = 's';
   }
 
 
 
-if(sendpythonold!=sendpythonnew)
+if(pythonold!=pythonnew)
 {
- Serial.write(sendpythonnew);
+ Serial.write(pythonnew);
  delay(400); 
-sendpythonold=sendpythonnew;
+pythonold=pythonnew;
 }
 if(Serial.available())
   { buzzervalue = Serial.read();
